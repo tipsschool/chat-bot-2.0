@@ -1,325 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc;
-        }
-        /* Custom scrollbar for chat area */
-        #chat-window::-webkit-scrollbar {
-            width: 8px;
-        }
-        #chat-window::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
-        #chat-window::-webkit-scrollbar-track {
-            background: #f7f9fc;
-        }
-        .user-message {
-            background-color: #3b82f6; /* Blue 500 */
-            color: white;
-            border-radius: 1rem 1rem 0.25rem 1rem;
-            align-self: flex-end;
-        }
-        .bot-message {
-            background-color: #ffffff;
-            color: #1f2937; /* Gray 800 */
-            border-radius: 1rem 1rem 1rem 0.25rem;
-            align-self: flex-start;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Affan AI Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #f8f4f4 0%, #121213 50%);
+      font-family: "Inter", sans-serif;
+    }
+    .glass {
+      background: rgb(10, 10, 10);
+      backdrop-filter: blur(12px);
+      border: 1px solid #ffffff;
+    }
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #a3bffa;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 0 3px;
+      animation: blink 1s infinite alternate;
+    }
+    @keyframes blink {
+      from { opacity: 0.2; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen text-white">
 
-    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl flex flex-col h-[90vh] md:h-[80vh]">
-        <!-- Header -->
-        <header class="p-4 bg-gray-900 text-white rounded-t-2xl flex items-center justify-between">
-            <h1 class="text-xl font-bold flex items-center">
-                <svg class="w-6 h-6 mr-2 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-0.75-3M3 14h18M5 17h14M7 14h10M4 10h16a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3a1 1 0 011-1z"></path></svg>
-                Pro AI Assistant
-            </h1>
-            <button id="clear-btn" class="text-sm px-3 py-1 bg-red-600 hover:bg-red-700 transition duration-150 rounded-full font-medium shadow-md">
-                Clear Chat
-            </button>
-        </header>
-
-        <!-- Chat Window -->
-        <main id="chat-window" class="flex-grow p-4 overflow-y-auto space-y-4">
-            <!-- Initial Bot Message -->
-            <div class="flex bot-message max-w-[85%] p-3 shadow-md">
-                <p>Hello! I am a highly knowledgeable and professional AI assistant, powered by Gemini. How may I assist you with your technical or analytical queries today?</p>
-            </div>
-            <!-- Messages will be appended here -->
-        </main>
-
-        <!-- Loading Indicator -->
-        <div id="loading" class="hidden p-3 text-center text-sm text-gray-500">
-            <div class="flex items-center justify-center space-x-2">
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse delay-100"></div>
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse delay-200"></div>
-                <span class="ml-2">AI is typing...</span>
-            </div>
-        </div>
-        
-        <!-- Input Area -->
-        <div class="p-4 border-t border-gray-200">
-            <div id="error-message" class="text-sm text-red-500 mb-2 hidden"></div>
-            <div class="flex">
-                <input type="text" id="user-input" placeholder="Ask a professional question..."
-                       class="flex-grow p-3 border border-gray-300 rounded-l-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
-                       onkeydown="if(event.key === 'Enter') document.getElementById('send-btn').click();">
-                <button id="send-btn"
-                        class="px-5 py-3 bg-blue-600 text-white font-semibold rounded-r-xl hover:bg-blue-700 transition duration-150 shadow-lg disabled:bg-blue-400">
-                    Send
-                </button>
-            </div>
-        </div>
+  <div class="w-full max-w-xl h-[85vh] flex flex-col glass rounded-3xl shadow-2xl overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+      <div class="flex items-center gap-3">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="bot" class="w-10 h-10 rounded-full">
+        <h1 class="text-xl font-semibold tracking-wide">Affan AI Assistant 🤖</h1>
+      </div>
+      <button id="mute-btn" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm">🔊 Voice On</button>
     </div>
 
-    <!-- Modal for error/info messages (instead of alert()) -->
-    <div id="info-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl transform transition-all">
-            <h3 id="modal-title" class="text-lg font-bold mb-3 text-gray-800"></h3>
-            <p id="modal-body" class="text-gray-600 mb-6"></p>
-            <button onclick="document.getElementById('info-modal').classList.add('hidden'); document.getElementById('info-modal').classList.remove('flex');" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-150">
-                Close
-            </button>
+    <!-- Chat -->
+    <div id="chat-box" class="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+      <div class="flex justify-start">
+        <div class="bg-white/10 px-4 py-2 rounded-2xl max-w-[80%]">
+          👋 Hi, I’m <b>Affan AI</b>. Upload a file, photo, or ask me anything.
         </div>
+      </div>
     </div>
 
-    <script>
-        // --- Gemini API Configuration ---
-        const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
-        // The API key is provided automatically by the Canvas environment if left empty.
-        const API_KEY = "AIzaSyBiaqHHBnwQUGY-fASkjyBjPmAulZvc1bc";
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+    <!-- Input -->
+    <div class="p-4 border-t border-white/10 bg-transparent flex items-center gap-3">
+      <label for="file-upload" class="cursor-pointer">
+        <img src="https://cdn-icons-png.flaticon.com/512/747/747968.png" alt="upload" class="w-7 h-7 opacity-80 hover:opacity-100">
+      </label>
+      <input id="file-upload" type="file" class="hidden" accept="image/*,.txt,.pdf,.docx,.xlsx" />
 
-        // System Instruction to define the "pro" persona
-        const SYSTEM_INSTRUCTION = "You are a professional, sophisticated, and concise AI assistant. Your goal is to provide accurate, detailed, and relevant information in a helpful and formal tone. Always use Markdown for formatting your response.";
-        
-        // --- DOM Elements ---
-        const chatWindow = document.getElementById('chat-window');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const loadingIndicator = document.getElementById('loading');
-        const clearBtn = document.getElementById('clear-btn');
-        const errorMessageDiv = document.getElementById('error-message');
+      <input id="user-input" type="text" placeholder="Type a message..."
+        class="flex-1 px-4 py-3 bg-white/10 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl font-semibold transition">Send</button>
+    </div>
+  </div>
 
-        // --- State Management ---
-        let chatHistory = [];
-        let isSending = false;
+  <script>
+const GEMINI_API_KEY = "AIzaSyCNZXhVbn9p5-kKeIC3b0UCubmIn1gYOnQ"; // 🔑 Replace this
+    const GEMINI_URL =
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-        // --- Utility Functions ---
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const fileUpload = document.getElementById("file-upload");
+    const muteBtn = document.getElementById("mute-btn");
 
-        /**
-         * Shows a custom modal with a title and message.
-         * @param {string} title
-         * @param {string} message
-         */
-        function showModal(title, message) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-body').textContent = message;
-            document.getElementById('info-modal').classList.remove('hidden');
-            document.getElementById('info-modal').classList.add('flex');
-        }
+    let isMuted = false; // 🎧 Voice toggle
 
-        /**
-         * Appends a message to the chat window and scrolls to the bottom.
-         * @param {string} text - The message content.
-         * @param {string} sender - 'user' or 'bot'.
-         */
-        function appendMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'flex max-w-[85%]';
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", (e) => e.key === "Enter" && sendMessage());
+    fileUpload.addEventListener("change", handleFileUpload);
+    muteBtn.addEventListener("click", toggleMute);
 
-            const contentDiv = document.createElement('div');
-            contentDiv.classList.add('p-3', 'shadow-md', 'transition', 'duration-300', 'ease-in-out');
+    function appendMessage(sender, message, isImage = false) {
+      const div = document.createElement("div");
+      div.className = sender === "user" ? "flex justify-end" : "flex justify-start";
 
-            if (sender === 'user') {
-                contentDiv.classList.add('user-message');
-                messageDiv.classList.add('justify-end');
-            } else {
-                contentDiv.classList.add('bot-message');
-                messageDiv.classList.add('justify-start');
-                // Format the bot's Markdown response to HTML (basic conversion)
-                contentDiv.innerHTML = formatMarkdown(text);
-            }
-            
-            if (sender === 'user') {
-                 contentDiv.textContent = text;
-            }
+      const bubble = document.createElement("div");
+      bubble.className =
+        sender === "user"
+          ? "bg-blue-600 px-4 py-2 rounded-2xl max-w-[80%] shadow-md"
+          : "bg-white/10 px-4 py-2 rounded-2xl max-w-[80%] shadow-md";
 
-            messageDiv.appendChild(contentDiv);
-            chatWindow.appendChild(messageDiv);
-            
-            // Scroll to the latest message
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
+      if (isImage) {
+        const img = document.createElement("img");
+        img.src = message;
+        img.className = "rounded-lg max-w-[200px]";
+        bubble.appendChild(img);
+      } else {
+        bubble.innerText = message;
+      }
 
-        /**
-         * Basic Markdown to HTML conversion for display.
-         * @param {string} text 
-         * @returns {string} HTML string
-         */
-        function formatMarkdown(text) {
-            let html = text;
-            // Headers
-            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-            // Bold
-            html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-            // Italic
-            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-            // Lists (simple unordered)
-            html = html.replace(/^\* (.*$)/gim, '<li>$1</li>');
-            if (html.includes('<li>')) {
-                html = '<ul>' + html + '</ul>';
-                html = html.replace(/<\/li><ul>/g, '</li>');
-            }
-            // Code blocks
-            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-100 p-2 rounded-md overflow-x-auto my-2"><code>$2</code></pre>');
-            // Inline code
-            html = html.replace(/`([^`]+)`/g, '<code class="bg-gray-200 px-1 rounded">$1</code>');
-            // Paragraph breaks
-            html = html.replace(/\n\n/g, '<p></p>');
-            return html.trim();
-        }
+      div.appendChild(bubble);
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        /**
-         * Clears the chat history and updates the UI.
-         */
-        function clearChat() {
-            chatHistory = [];
-            chatWindow.innerHTML = `
-                <div class="flex bot-message max-w-[85%] p-3 shadow-md">
-                    <p>Hello! I am a highly knowledgeable and professional AI assistant, powered by Gemini. How may I assist you with your technical or analytical queries today?</p>
-                </div>
-            `;
-            userInput.value = '';
-            showModal("Chat Cleared", "The conversation history has been reset.");
-        }
+    function showTyping() {
+      const div = document.createElement("div");
+      div.id = "typing";
+      div.className = "flex justify-start items-center gap-2";
+      div.innerHTML = `
+        <div class='bg-white/10 px-4 py-2 rounded-2xl flex gap-1'>
+          <span class='typing-dot'></span>
+          <span class='typing-dot'></span>
+          <span class='typing-dot'></span>
+        </div>`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        // --- API & Core Logic ---
+    function removeTyping() {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+    }
 
-        /**
-         * Retries the API call with exponential backoff on failure.
-         * @param {Function} apiCall - The function that performs the fetch.
-         * @param {number} maxRetries - Maximum number of retries.
-         * @param {number} delay - Initial delay in milliseconds.
-         */
-        async function fetchWithBackoff(apiCall, maxRetries = 3, delay = 1000) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await apiCall();
-                    if (response.ok) {
-                        return response;
-                    }
-                    // Throw an error for non-successful HTTP status codes
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                } catch (error) {
-                    if (i === maxRetries - 1) {
-                        // If it's the last retry, re-throw the final error
-                        console.error('Final API call failed after retries:', error);
-                        throw new Error('Could not connect to the AI service. Please check your network or try again later.');
-                    }
-                    console.warn(`API call failed. Retrying in ${delay / 1000}s...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2; // Exponential increase
-                }
-            }
-        }
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
 
-        /**
-         * Sends the user's message to the Gemini API and processes the response.
-         */
-        async function sendMessage() {
-            if (isSending) return;
+      appendMessage("user", text);
+      userInput.value = "";
+      showTyping();
 
-            const userText = userInput.value.trim();
-            if (!userText) return;
+      try {
+        const res = await fetch(GEMINI_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text }] }],
+          }),
+        });
 
-            // 1. Update UI and State
-            isSending = true;
-            userInput.value = '';
-            sendBtn.disabled = true;
-            errorMessageDiv.classList.add('hidden');
-            loadingIndicator.classList.remove('hidden');
-            
-            appendMessage(userText, 'user');
-            
-            // Add user message to history
-            chatHistory.push({ role: "user", parts: [{ text: userText }] });
+        const data = await res.json();
+        removeTyping();
 
-            // 2. Prepare API Payload
-            const payload = {
-                contents: chatHistory,
-                systemInstruction: {
-                    parts: [{ text: SYSTEM_INSTRUCTION }]
-                },
-            };
+        let reply =
+          data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+          "⚠️ No response from Gemini.";
 
-            // 3. Define the fetch operation for backoff utility
-            const apiCall = () => fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        // Remove markdown symbols
+        reply = reply.replace(/[#*_`]/g, "").trim();
 
-            let botResponseText = "An unexpected error occurred. Please try again.";
+        appendMessage("bot", reply);
+        if (!isMuted) speak(reply);
+      } catch (err) {
+        removeTyping();
+        appendMessage("bot", "❌ Error connecting to Gemini API");
+        console.error(err);
+      }
+    }
 
-            try {
-                const response = await fetchWithBackoff(apiCall);
-                const result = await response.json();
-                
-                const candidate = result.candidates?.[0];
+    function speak(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-US";
+      speech.rate = 1;
+      speech.pitch = 1;
+      window.speechSynthesis.speak(speech);
+    }
 
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    botResponseText = candidate.content.parts[0].text;
-                } else if (result.error?.message) {
-                    botResponseText = `Error: ${result.error.message}`;
-                } else {
-                     botResponseText = "The AI returned an empty or invalid response structure.";
-                }
+    function toggleMute() {
+      isMuted = !isMuted;
+      muteBtn.textContent = isMuted ? "🔇 Muted" : "🔊 Voice On";
+      muteBtn.classList.toggle("bg-red-500", isMuted);
+      muteBtn.classList.toggle("bg-white/10", !isMuted);
+    }
 
-                // 4. Update Chat History
-                chatHistory.push({ role: "model", parts: [{ text: botResponseText }] });
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-            } catch (error) {
-                console.error("API Communication Error:", error);
-                botResponseText = `I apologize, but I encountered a communication error with the service. (${error.message || "Unknown error"})`;
-                errorMessageDiv.textContent = botResponseText;
-                errorMessageDiv.classList.remove('hidden');
-                
-                // Remove the last user message from history if the response failed
-                chatHistory.pop(); 
-            } finally {
-                // 5. Final UI Update
-                loadingIndicator.classList.add('hidden');
-                sendBtn.disabled = false;
-                isSending = false;
-                
-                // Append the final bot response
-                appendMessage(botResponseText, 'bot');
-            }
-        }
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => appendMessage("user", e.target.result, true);
+        reader.readAsDataURL(file);
+      } else {
+        appendMessage("user", `📎 Uploaded: ${file.name}`);
+      }
 
-        // --- Event Listeners ---
-        sendBtn.addEventListener('click', sendMessage);
-        clearBtn.addEventListener('click', clearChat);
-        
-    </script>
-
+      fileUpload.value = "";
+    }
+  </script>
 </body>
 </html>
